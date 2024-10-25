@@ -36,6 +36,19 @@ test("textInlineFile", function (t) {
     t.end();
 });
 
+test("gzipInlineFile", function (t) {
+    var file = nrrd.parse(fs.readFileSync('example5.nrrd'));
+    
+    t.equal(file.type, 'int16');
+    t.equal(file.dimension, 3);
+    t.equal(file.sizes.length, 3);
+    t.equal(file.sizes[0], 30);
+    t.equal(file.sizes[1], 30);
+    t.equal(file.sizes[2], 30);
+
+    t.end();
+});
+
 test("roundtrip", function (t) {
     var file = nrrd.parse(nrrd.serialize(nrrd.parse(fs.readFileSync('example2.nrrd')))),
         i, list = [1,2,3, 65000,64000,63000, 10000,11000,12000, 4,5,6];

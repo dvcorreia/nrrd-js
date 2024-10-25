@@ -336,6 +336,19 @@ module.exports.parse = function (buffer) {
         case 'ascii':
             ret.data = parseNRRDTextData(ret.buffer, ret.type, ret.sizes);
             break;
+        case 'gzip':
+            const compressedStream = new Blob([ret.buffer]).stream();
+            const decompressStream = compressedStream.pipeThrough(new DecompressionStream('gzip'));
+
+            new Response(decompressStream).arrayBuffer().then(decompressedData => {
+                ret.data = parseNRRDRawData(decompressedData, ret.type, ret.sizes, {
+                    endian: ret.endian,
+                    blockSize: ret.blockSize
+                });
+            }).catch(error => {
+                console.error('gzip decompression failed:', error);
+            });
+            break;
         default:
             console.warn("Unsupported NRRD encoding: " + ret.encoding);
         }
